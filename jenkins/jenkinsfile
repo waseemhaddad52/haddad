@@ -1,5 +1,5 @@
 def branchName               = "${params.branchName}"
-def gitUrl                   =  "git@github.com:waseemhaddad52/haddad.git"
+def gitUrl                   =  "https://github.com/waseemhaddad52/haddad.git"
 def serviceName              =  "waseem-ecr"
 def EnvName                  =  "dev"
 def imageTag                 =  "${serviceName}:${EnvName}_${BUILD_NUMBER}"
