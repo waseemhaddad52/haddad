@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: todo-list-service
+spec:
+  type: LoadBalancer  # To expose the service externally
+  selector:
+    app: todo-list
+  ports:
+  - name: http  # Name for the HTTP port
+    protocol: TCP
+    port: 80  # The external port exposed
+    targetPort: 80  # The port your container listens to
+  - name: mysql  # Name for the MySQL port
+    protocol: TCP
+    port: 3306  # External port exposed for MySQL
+    targetPort: 3306  # The port your MySQL container listens to (if needed)
