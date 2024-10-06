@@ -4,7 +4,7 @@ def serviceName = "todo_list"
 def EnvName = "dev"
 def imageTag = "waseem-ecr:${EnvName}_${BUILD_NUMBER}"
 def awsRegion = "us-east-2"
-def ecrUrl = "727245885999.dkr.ecr.us-east-2.amazonaws.com"
+def ecrUrl = "727245885999.dkr.ecr.us-east-2.amazonaws.com/waseem-ecr"
 
 node () {
     cleanWs()
