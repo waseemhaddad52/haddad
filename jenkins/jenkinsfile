@@ -27,12 +27,12 @@ pipeline {
                             userRemoteConfigs: [[url: "${gitUrl}"]]
                         ])
                         sh "rm -rf .git"  // Changed from ".get" to ".git" assuming typo
-                        sh("cp dokers/Dockerfile .")
-                        sh("cp dokers/index.html .")
-                        sh("cp dokers/info.php .")
-                        sh("cp dokers/supervisord.conf .")
-                        sh("cp dokers/nginx.conf .")
-                        sh("cp dokers/todo_list.php .")
+                        sh("cp dockers/Dockerfile .")
+                        sh("cp dockers/index.html .")
+                        sh("cp dockers/info.php .")
+                        sh("cp dockers/supervisord.conf .")
+                        sh("cp dockers/nginx.conf .")
+                        sh("cp dockers/todo_list.php .")
 
                     } catch (e) {
                         currentBuild.result = 'FAILED'
