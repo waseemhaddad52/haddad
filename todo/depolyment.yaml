@@ -13,7 +13,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: momen-todo.slashtec.com
+  - host: waseem-todo.slashtec.com
     http:
       paths:
       - path: /
