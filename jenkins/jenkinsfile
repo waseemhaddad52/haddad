@@ -1,71 +1,83 @@
-def branchName               = "${params.branchName}"
-def gitUrl                   =  "https://github.com/waseemhaddad52/haddad.git"
-def serviceName              =  "waseem-ecr"
-def EnvName                  =  "dev"
-def imageTag                 =  "${serviceName}:${EnvName}_${BUILD_NUMBER}"
-def awsRegion                =  "us-east-2"
-def ecrUrl                   =  "727245885999.dkr.ecr.us-east-2.amazonaws.com"
+def branchName = "main"
+def gitUrl = "https://github.com/waseemhaddad52/haddad.git"
+def serviceName = "todo_list"
+def EnvName = "dev"
+def imageTag = "waseem-ecr:${EnvName}_${BUILD_NUMBER}"
+def awsRegion = "us-east-2"
+def ecrUrl = "727245885999.dkr.ecr.us-east-2.amazonaws.com"
 
-pipeline {
-    agent any
-    parameters {
-        string(defaultValue: 'main', name: 'branchName', description: 'Branch name to build')
+node () {
+    cleanWs()
+    try {
+        notifyBuild('STARTED')
+        
+        script {
+            properties([
+                parameters([
+                    string(defaultValue: 'main', name: 'branchName')
+                ])
+            ])
+        }
+
+        stage ("Code Checkout") {
+            checkout([$class: 'GitSCM', branches: [[name: "${branchName}"]], extensions: [], userRemoteConfigs: [[url: "${gitUrl}"]]])
+            sh "rm -rf .git"   
+        }
+
+        stage ('ECR Login') {
+            sh "aws ecr get-login-password --region ${awsRegion} | docker login --username AWS --password-stdin ${ecrUrl}"
+        }  
+
+stage ('Docker Build') {
+    script {
+        // Change directory to Docker and then run the build
+        dir('Docker') {
+            sh "docker build -t ${ecrUrl}/${imageTag} ."
+        }
     }
-    stages {
-        stage('Clean Workspace') {
-            steps {
-                cleanWs()
-            }
-        }
-        stage('Code Checkout') {
-            steps {
-                script {
-                    try {
-                        checkout([$class: 'GitSCM', 
-                            branches: [[name: "${branchName}"]],
-                            extensions: [],
-                            userRemoteConfigs: [[url: "${gitUrl}"]]
-                        ])
-                        sh "rm -rf .git"  // Changed from ".get" to ".git" assuming typo
-                        sh("cp dockers/Dockerfile .")
-                        sh("cp dockers/index.html .")
-                        sh("cp dockers/info.php .")
-                        sh("cp dockers/supervisord.conf .")
-                        sh("cp dockers/nginx.conf .")
-                        sh("cp dockers/todo_list.php .")
+}
 
-                    } catch (e) {
-                        currentBuild.result = 'FAILED'
-                        throw e
-                    }
-                }
-            }
+
+        stage ('Docker Push') {
+            sh "docker push ${ecrUrl}/${imageTag}"
+        }  
+
+        stage ("Docker Run Deployment") {
+            //sh "docker run -d -p 80:80 -p 3306:3306 ${ecrUrl}/${imageTag}"
+            sh "kubectl apply -f todo/deployment.yaml"
+            sh "kubectl apply -f todo/service.yaml"
         }
-        stage('ECR Login') {
-            steps {
-                sh ("aws ecr get-login-password --region ${awsRegion} | docker login --username AWS --password-stdin ${ecrUrl}")
-            }
-        }
-        stage('Docker Build') {
-            steps {
-                
-                sh "docker build -t ${ecrUrl}/${imageTag} ."
-            }
-        }
-        stage('Docker Push') {
-            steps {
-                sh "docker push ${ecrUrl}/${imageTag}"
-            }
-        }
-        stage('Docker Run Deployment') {
-            steps {
-                sh "docker run -d -p 80:80 -p 3306:3306 ${ecrUrl}/${imageTag}"
-            }
-        }
+
         stage('Remove Local Images') {
-            steps {
-                sh "docker rmi -f ${ecrUrl}/${imageTag} || :"
-            }
-        }
+            sh "docker rmi -f ${ecrUrl}/${imageTag} || :"
+        }   
+    } catch (e) {
+        // If there was an exception thrown, the build failed
+        currentBuild.result = "FAILED"
+        throw e
+    } finally {
+        // Success or failure, always send notifications
+        notifyBuild(currentBuild.result)
     }
+}
+
+def notifyBuild(String buildStatus = 'STARTED') {
+    // build status of null means successful
+    buildStatus = buildStatus ?: 'SUCCESSFUL'
+
+    // Default values
+    def colorCode = '#FF0000'
+    def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
+    def summary = "${subject} (${env.BUILD_URL})"
+
+    // Override default values based on build status
+    if (buildStatus == 'STARTED') {
+        colorCode = '#FFFF00'
+    } else if (buildStatus == 'SUCCESSFUL') {
+        colorCode = '#00FF00'
+    }
+
+    // Send notifications
+  //  slackSend(webhookUrl: 'https://hooks.slack.com/services/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', 
+              //channel: '#trainee-q4', color: colorCode, message: summary)
 }
