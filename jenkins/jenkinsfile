@@ -28,21 +28,21 @@ node () {
             sh "aws ecr get-login-password --region ${awsRegion} | docker login --username AWS --password-stdin ${ecrUrl}"
         }  
 
-stage ('Docker Build') {
+stage ('dockers Build') {
     script {
         // Change directory to Docker and then run the build
-        dir('Docker') {
+        dir('dockers') {
             sh "docker build -t ${ecrUrl}/${imageTag} ."
         }
     }
 }
 
 
-        stage ('Docker Push') {
+        stage ('dockers Push') {
             sh "docker push ${ecrUrl}/${imageTag}"
         }  
 
-        stage ("Docker Run Deployment") {
+        stage ("dockers Run Deployment") {
             //sh "docker run -d -p 80:80 -p 3306:3306 ${ecrUrl}/${imageTag}"
             sh "kubectl apply -f todo/deployment.yaml"
             sh "kubectl apply -f todo/service.yaml"
