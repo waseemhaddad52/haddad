@@ -1,88 +1,71 @@
 def branchName               = "${params.branchName}"
 def gitUrl                   =  "git@github.com:waseemhaddad52/haddad.git"
-def serviceName              =  "todo_list"
+def serviceName              =  "waseem-ecr"
 def EnvName                  =  "dev"
 def imageTag                 =  "${serviceName}:${EnvName}_${BUILD_NUMBER}"
 def awsRegion                =  "us-east-2"
-def ecrUrl                   =  "727245885999.dkr.ecr.us-east-2.amazonaws.com/waseem-ecr"
+def ecrUrl                   =  "727245885999.dkr.ecr.us-east-2.amazonaws.com"
 
+pipeline {
+    agent any
+    parameters {
+        string(defaultValue: 'main', name: 'branchName', description: 'Branch name to build')
+    }
+    stages {
+        stage('Clean Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+        stage('Code Checkout') {
+            steps {
+                script {
+                    try {
+                        checkout([$class: 'GitSCM', 
+                            branches: [[name: "${branchName}"]],
+                            extensions: [],
+                            userRemoteConfigs: [[url: "${gitUrl}"]]
+                        ])
+                        sh "rm -rf .git"  // Changed from ".get" to ".git" assuming typo
+                        sh("cp dokers/Dockerfile .")
+                        sh("cp dokers/index.html .")
+                        sh("cp dokers/info.php .")
+                        sh("cp dokers/supervisord.conf .")
+                        sh("cp dokers/nginx.conf .")
+                        sh("cp dokers/todo_list.php .")
 
-
-node  () {
-  cleanWs()
-  try {
-    notifyBuild('STARTED')
-      script {
-                properties([
-                  parameters([
-                    string(defaultValue:'main',name:'branchName')
-                  ])
-                ])
-          }
-
-    stage ("code checkout"){
-        checkout([$class: 'GitSCM', branches: [[name: "${branchName}"]] , extensions: [], userRemoteConfigs: [[ url: "${gitUrl}"]]]) 
-        sh "rm -rf .get	 "   
-     }
-
-
-
-    stage ('ECR login '){
-        sh ("aws ecr get-login-password --region ${awsRegion}  | docker login --username AWS --password-stdin ${ecrUrl}")
-    }  
-
-
-
-     stage ('Docker build'){
-         sh " docker build -t ${ecrUrl}/${imageTag} . "
-      
-     }
-
-    stage('Docker push '){
-        sh "docker push ${ecrUrl}/${imageTag} "
-    }  
-      
-     stage ("docker run deployment"){
-       sh "docker run -d -p 80:80 -p 3306:3306 ${ecrUrl}/${imageTag}"  
-   }
-
-
-    
-    stage('Remove local images') {
-        sh "docker rmi -f ${ecrUrl}/${imageTag} || :"
-    }   
+                    } catch (e) {
+                        currentBuild.result = 'FAILED'
+                        throw e
+                    }
+                }
+            }
+        }
+        stage('ECR Login') {
+            steps {
+                sh ("aws ecr get-login-password --region ${awsRegion} | docker login --username AWS --password-stdin ${ecrUrl}")
+            }
+        }
+        stage('Docker Build') {
+            steps {
+                
+                sh "docker build -t ${ecrUrl}/${imageTag} ."
+            }
+        }
+        stage('Docker Push') {
+            steps {
+                sh "docker push ${ecrUrl}/${imageTag}"
+            }
+        }
+        stage('Docker Run Deployment') {
+            steps {
+                sh "docker run -d -p 80:80 -p 3306:3306 ${ecrUrl}/${imageTag}"
+            }
+        }
+        stage('Remove Local Images') {
+            steps {
+                sh "docker rmi -f ${ecrUrl}/${imageTag} || :"
+            }
+        }
+    }
 }
-
-catch (e) {
-    // If there was an exception thrown, the build failed
-    currentBuild.result = "FAILED"
-    throw e
-  } finally {
-    // Success or failure, always send notifications
-  //notifyBuild(currentBuild.result)
-  }
-  }
-def notifyBuild(String buildStatus = 'STARTED') {
-  // build status of null means successful
-  buildStatus =  buildStatus ?: 'SUCCESSFUL'
-  // Default values
-  def colorName = 'RED'
-  def colorCode = '#FF0000'
-  def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
-  def summary = "${subject} (${env.BUILD_URL})"
-  // Override default values based on build status
-  if (buildStatus == 'STARTED') {
-    color = 'YELLOW'
-    colorCode = '#FFFF00'
-  } else if (buildStatus == 'SUCCESSFUL') {
-    color = 'GREEN'
-    colorCode = '#00FF00'
-  } else {
-    color = 'RED'
-    colorCode = '#FF0000'
-  }
-  // deleteDir() 
-
-  // Send notifications
-//slackSend(webhookUrl: 'https://hooks.slack.com/services/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', channel: '#trainee-q4', color: colorCode, message: summary)
- }
