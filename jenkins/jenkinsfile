@@ -25,7 +25,7 @@ node  () {
         sh "rm -rf .get	 "   
      }
 
-  }
+
 
     stage ('ECR login '){
         sh ("aws ecr get-login-password --region ${awsRegion}  | docker login --username AWS --password-stdin ${ecrUrl}")
