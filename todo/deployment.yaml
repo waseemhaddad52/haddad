@@ -1,25 +1,25 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: todo-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-        add_header Content-Security-Policy "upgrade-insecure-requests";
-        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
-    nginx.ingress.kubernetes.io/cors-allow-origin: '*'
-    nginx.ingress.kubernetes.io/enable-cors: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  name: todo-list-deployment
+  labels:
+    app: todo-list
 spec:
-  ingressClassName: nginx
-  rules:
-  - host: waseem-todo.slashtec.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: todo-list-service
-            port:
-              number: 80
+  replicas: 2  # Number of replicas (pods) to be created
+  selector:
+    matchLabels:
+      app: todo-list
+  template:
+    metadata:
+      labels:
+        app: todo-list
+    spec:
+      containers:
+      - name: todo-list-container
+        image: 727245885999.dkr.ecr.us-east-2.amazonaws.com/waseem-ecr:dev_27  # Make sure this image tag exists in your ECR
+        ports:
+        - containerPort: 80  # HTTP server port
+        - containerPort: 3306  # Database port (MySQL, if relevant)
+        env:
+        - name: ENV_NAME
+          value: "dev"  # Define any environment variables you need
