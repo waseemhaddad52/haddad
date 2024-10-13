@@ -5,6 +5,8 @@ def EnvName = "dev"
 def imageTag = "waseem-ecr:${EnvName}_${BUILD_NUMBER}"
 def awsRegion = "us-east-2"
 def ecrUrl = "727245885999.dkr.ecr.us-east-2.amazonaws.com"
+def helmChartPath = "Slashtec-Helm-Chart-main/charts/slashtec-helm-chart"
+def valuesFile = "${helmChartPath}/values.yaml"
 
 node () {
     cleanWs()
@@ -28,24 +30,24 @@ node () {
             sh "aws ecr get-login-password --region ${awsRegion} | docker login --username AWS --password-stdin ${ecrUrl}"
         }  
 
-stage ('dockers Build') {
-    script {
-        // Change directory to Docker and then run the build
-        dir('dockers') {
-            sh "docker build -t ${ecrUrl}/${imageTag} ."
+        stage ('dockers Build') {
+            script {
+                // Change directory to Docker and then run the build
+                dir('dockers') {
+                    sh "docker build -t ${ecrUrl}/${imageTag} ."
+                }
+            }
         }
-    }
-}
-
 
         stage ('dockers Push') {
             sh "docker push ${ecrUrl}/${imageTag}"
         }  
 
-        stage ("dockers Run Deployment") {
-            //sh "docker run -d -p 80:80 -p 3306:3306 ${ecrUrl}/${imageTag}"
-            sh "kubectl apply -f todo/deployment.yaml"
-            sh "kubectl apply -f todo/service.yaml"
+        stage ("Helm Deployment") {
+            script {
+                // Deploy using Helm
+                sh "helm upgrade --install ${serviceName} ${helmChartPath} -f ${valuesFile} --set image.repository=${ecrUrl}/${serviceName} --set image.tag=${BUILD_NUMBER}"
+            }
         }
 
         stage('Remove Local Images') {
@@ -78,6 +80,6 @@ def notifyBuild(String buildStatus = 'STARTED') {
     }
 
     // Send notifications
-  //  slackSend(webhookUrl: 'https://hooks.slack.com/services/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', 
-              //channel: '#trainee-q4', color: colorCode, message: summary)
+    // slackSend(webhookUrl: 'https://hooks.slack.com/services/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', 
+    // channel: '#trainee-q4', color: colorCode, message: summary)
 }
