@@ -1,0 +1,26 @@
+nameOverride: &nameOverride "my-service"
+fullnameOverride: &fullnameOverride "my-service"
+cluster: &cluster "dev"
+environment: &environment "dev"
+
+deployment:
+  service:
+      containerPort: 8080
+  image:
+    repository: nginx
+    tag: latest
+  nodeSelector:
+    group: services-workers
+  tolerations:
+    - key: special-nodegroup
+      operator: Equal
+      value: services-workers
+      effect: NoSchedule
+ingress:
+  enabled: false
+
+externalSecret:
+  enabled: false
+
+persistence:
+  enabled: false

@@ -1,0 +1,28 @@
+nameOverride: &nameOverride "my-service"
+fullnameOverride: &fullnameOverride "my-service"
+cluster: &cluster "dev"
+environment: &environment "dev"
+
+deployment:
+  service:
+      containerPort: 8080
+  image:
+    repository: nginx
+    tag: latest
+  volumes:
+    - name: persistent-storage
+      persistentVolumeClaim:
+        claimName: efs-claim
+  volumeMounts:
+    - mountPath: /var/www/analysis-service/storage/app
+      name: persistent-storage
+ingress:
+  enabled: false
+
+externalSecret:
+  enabled: false
+
+persistence:
+  enabled: true
+
+

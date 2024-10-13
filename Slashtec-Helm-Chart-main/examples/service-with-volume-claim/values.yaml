@@ -1,0 +1,25 @@
+nameOverride: &nameOverride "my-service"
+fullnameOverride: &fullnameOverride "my-service"
+cluster: &cluster "dev"
+environment: &environment "dev"
+
+deployment:
+  service:
+      containerPort: 8080
+  image:
+    repository: nginx
+    tag: latest
+  volumeMounts:
+    - mountPath: /etc/nginx/conf.d
+      name: *nameOverride
+ingress:
+  enabled: false
+
+externalSecret:
+  enabled: false
+
+persistence:
+  enabled: true
+  storageClass: gp3
+  size: 10
+  accessMode: ReadWriteOnce

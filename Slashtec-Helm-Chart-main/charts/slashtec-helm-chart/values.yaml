@@ -1,0 +1,181 @@
+# Override the default helm chart name
+nameOverride: &nameOverride ""
+# Override the default helm chart full name
+fullnameOverride: &fullnameOverride ""
+# Specify the cluster name
+cluster: &cluster ""
+# Specify the environment name (production, staging, prodelopment, etc.)
+
+environment: &environment ""
+# Labels to attach to all Kubernetes resources created by this chart
+
+commonLabels:
+  app_name: *nameOverride
+  app_env: *environment
+  app: *nameOverride
+selectorLabels:
+  app_name: *nameOverride
+# Configuration for the service account
+serviceAccount:
+  create: false
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::<acc-id>:role/<name> 
+  name: *nameOverride
+  multiServiceAccounts:
+    enabled: false
+# Deployment configuration
+deployment:
+  #  postStartCommand: "composer dumpautoload"
+  enabled: true
+  revisionHistoryLimit: "1"
+  terminationGracePeriodSeconds: "5"
+  replicaCount: 1
+  service:
+    port:
+      - name: http
+        containerPort: 8080
+        protocol: TCP
+  image:
+    repository: <acc-id>.dkr.ecr.<region>.amazonaws.com/<repo-name>
+    pullPolicy: IfNotPresent
+    tag: ""
+  #envFrom: "externalSecret"
+  volumeMounts:
+    - mountPath: /path/to/folder
+      name: *nameOverride
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 2
+  livenessProbe:
+    httpGet:
+      path: /
+      port: 80
+    initialDelaySeconds: 20
+    periodSeconds: 10
+    failureThreshold: 3
+    timeoutSeconds: 10
+  readinessProbe:
+    httpGet:
+      path: /
+      port: 80
+    initialDelaySeconds: 20
+    periodSeconds: 10
+    failureThreshold: 3
+    timeoutSeconds: 10
+  startupProbe: {}
+  podAnnotations: {}
+  serviceDefault:
+    enabled: false
+  serviceIntention:
+    enabled: false
+  podSecurityContext: {}
+  securityContext: {}
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 200m
+    limits:
+      memory: 1024Mi
+      cpu: 1
+  #nodeSelector:
+  #  group: service-workers
+  #tolerations:
+  #  - key: special-nodegroup
+  #    operator: Equal
+  #    value: service-workers
+  #    effect: NoSchedule
+  volumes:
+    - name: *nameOverride
+      persistentVolumeClaim:
+        claimName: *nameOverride
+  migrationjob:
+    enabled: false
+StatefulSet:
+  enabled: false
+cronjob:
+  enabled: false
+# ConfigMap configuration
+configMap:
+  config:
+    suffix: config
+    data:
+      App: *nameOverride
+      Description: Generic description
+service:
+  enabled: true
+  type: NodePort
+  name: *nameOverride
+  port:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      name: http
+  multiServices:
+    enabled: false
+# Ingress configuration
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: test.example.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: *nameOverride
+                port:
+                  number: 8080
+            path: /
+            pathType: Prefix
+  annotations:
+    #ingress.kubernetes.io/secure-backends: 'false'
+    #kubernetes.io/tls-acme: 'false'
+    nginx.ingress.kubernetes.io/proxy-body-size: '0'
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  tls:
+    enabled: false
+# ExternalSecret configuration
+externalSecret:
+  enabled: false
+  suffix: secret
+  kind: ClusterSecretStore
+  secretStore: global-secret-store
+  secretPath: /path/to/secret
+serviceMonitor:
+  enabled: false
+podMonitor:
+  enabled: false
+persistence:
+  enabled: false
+  storageClass: gp3
+  size: 10
+  accessMode: ReadWriteOnce
+# Autoscaling configuration
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 2
+  customTargets: []
+  scaleTarget: {}
+  # Example of Autoscaling configuration
+  targetCPUUtilizationPercentage: 85
+  targetMemoryUtilizationPercentage: 80
+# Database migration configuration
+goDBMigration:
+  enabled: false
+rustDBMigration:
+  enabled: false
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - *nameOverride
+          topologyKey: kubernetes.io/hostname
