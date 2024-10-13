@@ -19,7 +19,7 @@ selectorLabels:
 serviceAccount:
   create: false
   annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::<acc-id>:role/<name> 
+    eks.amazonaws.com/role-arn: arn:aws:iam::727245885999:role/<name> 
   name: *nameOverride
   multiServiceAccounts:
     enabled: false
