@@ -137,12 +137,12 @@ ingress:
   tls:
     enabled: false
 # ExternalSecret configuration
-externalSecret:
-  enabled: false
-  suffix: secret
-  kind: ClusterSecretStore
-  secretStore: global-secret-store
-  secretPath: /path/to/secret
+//externalSecret:
+ // enabled: false
+ // suffix: secret
+  //kind: ClusterSecretStore
+  //secretStore: global-secret-store
+  //secretPath: /path/to/secret
 serviceMonitor:
   enabled: false
 podMonitor:
