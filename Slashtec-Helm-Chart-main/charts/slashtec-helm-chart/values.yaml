@@ -1,7 +1,7 @@
 # Override the default helm chart name
-nameOverride: &nameOverride ""
+nameOverride: &nameOverride "todo-list"
 # Override the default helm chart full name
-fullnameOverride: &fullnameOverride ""
+fullnameOverride: &fullnameOverride "todo-list"
 # Specify the cluster name
 cluster: &cluster ""
 # Specify the environment name (production, staging, prodelopment, etc.)
