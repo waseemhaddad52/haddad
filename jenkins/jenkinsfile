@@ -30,7 +30,7 @@ node () {
         }  
 
         stage ('Docker Build') {
-            dir('dokers') {
+            dir('dockers') {
                 sh "docker build -t ${ecrUrl}/${imageTag} ."
             }
         }
