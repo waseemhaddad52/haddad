@@ -8,9 +8,9 @@ environment: "dev" # Default environment, will be overridden by Jenkins
 
 # Labels to attach to all Kubernetes resources created by this chart
 commonLabels:
-  app_name: "todo_list"
+  app_name: "todo-list"
   app_env: "dev"
-  app: "todo_list"
+  app: "todo-list"
 
 serviceAccount:
   create: false
