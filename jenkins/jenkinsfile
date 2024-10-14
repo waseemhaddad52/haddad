@@ -5,7 +5,7 @@ def EnvName                  =  "dev"
 def imageTag                 =  "waseem-ecr:${EnvName}_${BUILD_NUMBER}"
 def awsRegion                =  "us-east-2"
 def ecrUrl                   =  "727245885999.dkr.ecr.us-east-2.amazonaws.com"
-def releaseName              =  "todo-list-release"
+
 
 
 node () {
@@ -43,7 +43,7 @@ node () {
         stage ("Helm Deployment") {
             // Use Helm to install or upgrade with values.yaml path
             sh """
-                helm upgrade --install ${releaseName} helm/Slashtec-Helm-Chart-main/charts/slashtec-helm-chart \
+                helm upgrade --install  helm/Slashtec-Helm-Chart-main/charts/slashtec-helm-chart \
                 --namespace ${EnvName} \
                 --set image.repository=${ecrUrl}/${serviceName} \
                 --set image.tag=${imageTag} \
