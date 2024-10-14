@@ -1,6 +1,6 @@
 def branchName = "main"
 def gitUrl = "https://github.com/waseemhaddad52/haddad.git"
-def serviceName = "todo_list"
+def serviceName = "todo-list" // Updated service name
 def EnvName = "dev"
 def imageTag = "waseem-ecr:${EnvName}_${BUILD_NUMBER}"
 def awsRegion = "us-east-2"
@@ -30,22 +30,20 @@ node () {
             sh "aws ecr get-login-password --region ${awsRegion} | docker login --username AWS --password-stdin ${ecrUrl}"
         }  
 
-        stage ('dockers Build') {
+        stage ('Docker Build') {
             script {
-                // Change directory to Docker and then run the build
                 dir('dockers') {
                     sh "docker build -t ${ecrUrl}/${imageTag} ."
                 }
             }
         }
 
-        stage ('dockers Push') {
+        stage ('Docker Push') {
             sh "docker push ${ecrUrl}/${imageTag}"
         }  
 
         stage ("Helm Deployment") {
             script {
-                // Deploy using Helm
                 sh "helm upgrade --install ${serviceName} ${helmChartPath} -f ${valuesFile} --set image.repository=${ecrUrl}/${serviceName} --set image.tag=${BUILD_NUMBER}"
             }
         }
@@ -54,32 +52,27 @@ node () {
             sh "docker rmi -f ${ecrUrl}/${imageTag} || :"
         }   
     } catch (e) {
-        // If there was an exception thrown, the build failed
         currentBuild.result = "FAILED"
         throw e
     } finally {
-        // Success or failure, always send notifications
         notifyBuild(currentBuild.result)
     }
 }
 
 def notifyBuild(String buildStatus = 'STARTED') {
-    // build status of null means successful
     buildStatus = buildStatus ?: 'SUCCESSFUL'
 
-    // Default values
     def colorCode = '#FF0000'
     def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
     def summary = "${subject} (${env.BUILD_URL})"
 
-    // Override default values based on build status
     if (buildStatus == 'STARTED') {
         colorCode = '#FFFF00'
     } else if (buildStatus == 'SUCCESSFUL') {
         colorCode = '#00FF00'
     }
 
-    // Send notifications
+    // Uncomment and configure this line for Slack notifications
     // slackSend(webhookUrl: 'https://hooks.slack.com/services/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', 
     // channel: '#trainee-q4', color: colorCode, message: summary)
 }
