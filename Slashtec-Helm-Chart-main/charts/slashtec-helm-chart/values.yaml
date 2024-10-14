@@ -37,7 +37,7 @@ deployment:
   replicaCount: 1
   image:
     repository: "727245885999.dkr.ecr.us-east-2.amazonaws.com/derarecr"
-    tag: "dev_42"  # Set the correct tag
+    tag: ""  # Set the correct tag
     pullPolicy: IfNotPresent
   resources:
     requests:
