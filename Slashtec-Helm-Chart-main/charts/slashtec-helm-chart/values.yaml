@@ -1,7 +1,7 @@
 # Override the default helm chart name
-nameOverride: "todo_list"
+nameOverride: "todo-list"
 # Override the default helm chart full name
-fullnameOverride: "todo_list"
+fullnameOverride: "todo-list"
 cluster: "todo_cluster"
 # Specify the environment name (dev, staging, production, etc.)
 environment: "dev" # Default environment, will be overridden by Jenkins
