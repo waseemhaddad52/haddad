@@ -45,8 +45,8 @@ node () {
              sh """
                 helm upgrade --install  slashtec Slashtec-Helm-Chart-main/charts/slashtec-helm-chart \
                 --namespace ${EnvName} \
-                --set deployment.images.repository=${ecrUrl}/${serviceName} \
-                --set deployment.images.tag=${imageTag} \
+                --set deployment.image.repository=${ecrUrl}/${serviceName} \
+                --set deployment.image.tag=${imageTag} \
                 --create-namespace 
                
                 
