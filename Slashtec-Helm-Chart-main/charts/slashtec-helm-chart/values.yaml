@@ -108,14 +108,14 @@ ingress:
   enabled: true
   className: nginx
   hosts:
-    - host: "derar.yousefneedsajob.click"
+    - host: "waseem.yousefneedsajob.click"
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: "todo_list"
+                name: "todo-list"
                 port:
                   number: 8080
   tls:
