@@ -1,6 +1,6 @@
 def branchName = "main"
 def gitUrl = "https://github.com/waseemhaddad52/haddad.git"
-def serviceName = "todo_list"
+def serviceName = "todo-list"
 def EnvName = "dev"
 def imageTag = "waseem-ecr:${EnvName}_${BUILD_NUMBER}"
 def awsRegion = "us-east-2"
