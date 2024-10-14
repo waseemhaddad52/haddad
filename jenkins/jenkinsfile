@@ -2,7 +2,7 @@ def branchName               =  "main"
 def gitUrl                   =  "https://github.com/waseemhaddad52/haddad.git"
 def serviceName              =  "todo-list"
 def EnvName                  =  "dev"
-def imageTag                 =  "waseem-ecr:${EnvName}_${BUILD_NUMBER}"
+def imageTag                 =  "${EnvName}_${BUILD_NUMBER}"
 def awsRegion                =  "us-east-2"
 def ecrUrl                   =  "727245885999.dkr.ecr.us-east-2.amazonaws.com"
 
