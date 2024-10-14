@@ -47,9 +47,9 @@ deployment:
       memory: 1024Mi
       cpu: 1
   serviceIntention:
-    enabled: true
+    enabled: false
   serviceDefault:
-    enabled: true
+    enabled: false
   migrationjob:  # Define the migrationjob here
     enabled: false  # Set to true if you need the migration job
 
@@ -65,7 +65,7 @@ service:
       name: http
 
 autoscaling:
-  enabled: false  # Set this to true if you want to enable autoscaling
+  enabled: true  # Set this to true if you want to enable autoscaling
   minReplicas: 1
   maxReplicas: 10
   targetCPUUtilizationPercentage: 80
@@ -81,7 +81,7 @@ externalSecret:
   key: "your-secret-key"  # Key within the secret
   
 livenessProbe:
-  enabled: true  # Set to true if you want to enable liveness probe
+  enabled: false  # Set to true if you want to enable liveness probe
   initialDelaySeconds: 10
   periodSeconds: 10
   timeoutSeconds: 2
@@ -89,7 +89,7 @@ livenessProbe:
   successThreshold: 1
 
 readinessProbe:
-  enabled: true  # Set to true if you want to enable readiness probe
+  enabled: false  # Set to true if you want to enable readiness probe
   initialDelaySeconds: 10
   periodSeconds: 10
   timeoutSeconds: 2
