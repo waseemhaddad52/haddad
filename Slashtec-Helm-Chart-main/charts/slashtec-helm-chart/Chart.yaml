@@ -1,5 +1,5 @@
 apiVersion: v2
-name: slashtec-helm-chart
+name: todo-list-release 
 description: Centralized Helm Chart for slashtec Kubernetes Clusters
 icon: "https://helm.sh/img/helm.svg"
 # A chart can be either an 'application' or a 'library' chart.
