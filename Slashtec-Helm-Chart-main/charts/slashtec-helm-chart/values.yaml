@@ -101,6 +101,8 @@ goDBMigration:
   # Add other parameters as needed for migration, e.g., database URL, user, etc.
 rustDBMigration:
   enabled: false  # Set this to true if you want to enable the Rust DB migration job
+cronjob:
+  enabled: false
 
 ingress:
   enabled: true
