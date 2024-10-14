@@ -32,12 +32,12 @@ node () {
 
         stage ('Docker Build') {
             dir('dockers') {
-                sh "docker build -t ${ecrUrl}/${imageTag} ."
+                sh "docker build -t ${ecrUrl}/${serviceName}$:${imageTag} ."
             }
         }
 
         stage ('Docker Push') {
-            sh "docker push ${ecrUrl}/${serviceName}${imageTag}"
+            sh "docker push ${ecrUrl}/${serviceName}$:{imageTag}"
         }  
 
         stage ("Helm Deployment") {
