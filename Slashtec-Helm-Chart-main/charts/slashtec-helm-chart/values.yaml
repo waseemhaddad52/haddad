@@ -15,7 +15,7 @@ commonLabels:
 serviceAccount:
   create: false
   annotations: {}
-  name: "todo_list"
+  name: "todo-list"
   multiServiceAccounts:
     enabled: false  # Set this to true if you want to enable multi-service accounts
 
