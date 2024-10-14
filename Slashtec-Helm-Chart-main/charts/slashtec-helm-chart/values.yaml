@@ -140,7 +140,7 @@ ingress:
 //externalSecret:
  // enabled: false
  // suffix: secret
-  //kind: ClusterSecretStore
+
   //secretStore: global-secret-store
   //secretPath: /path/to/secret
 serviceMonitor:
