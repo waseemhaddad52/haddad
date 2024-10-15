@@ -1,16 +1,16 @@
 # Override the default helm chart name
-nameOverride: "todo-list"
+nameOverride: "hello-world"
 # Override the default helm chart full name
-fullnameOverride: "todo-list"
-cluster: "todo_cluster"
+fullnameOverride: "hello-world"
+cluster: "dev"
 # Specify the environment name (dev, staging, production, etc.)
 environment: "dev" # Default environment, will be overridden by Jenkins
 
 # Labels to attach to all Kubernetes resources created by this chart
 commonLabels:
-  app_name: "todo-list"
+  app_name: "hello-world"
   app_env: "dev"
-  app: "todo-list"
+  app: "hello-world"
 
 serviceAccount:
   create: false
@@ -37,7 +37,7 @@ deployment:
   replicaCount: 1
   image:
     repository: "727245885999.dkr.ecr.us-east-2.amazonaws.com/todo-list"
-    tag: "dev_40"  # Set the correct tag
+    tag: "dev_1"  # Set the correct tag
     pullPolicy: IfNotPresent
   resources:
     requests:
@@ -45,7 +45,7 @@ deployment:
       cpu: 200m
     limits:
       memory: 1024Mi
-      cpu: 1
+      cpu: 1000m
   serviceIntention:
     enabled: false
   serviceDefault:
@@ -59,15 +59,15 @@ service:
   enabled: true
   type: NodePort
   port:
-    - port: 8080
-      targetPort: 8080
+    - port: 3000
+      targetPort: 3000
       protocol: TCP
       name: http
 
 autoscaling:
   enabled: true  # Set this to true if you want to enable autoscaling
   minReplicas: 1
-  maxReplicas: 10
+  maxReplicas: 5
   targetCPUUtilizationPercentage: 80
 
 externalSecretgcp:
@@ -108,16 +108,16 @@ ingress:
   enabled: true
   className: nginx
   hosts:
-    - host: "waseem.yousefneedsajob.click"
+    - host: "waseem-hello-world.yousefneedsajob.click"
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: "todo-list"
+                name: "hello-world"
                 port:
-                  number: 8080
+                  number: 3000
   tls:
     enabled: false  # Set this to true if you want to enable TLS
     secretName: false  # This is required if TLS is enabled
