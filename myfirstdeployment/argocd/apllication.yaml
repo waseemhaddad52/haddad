@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: todo_list
+  name: hello-world
   namespace: argocd
 spec:
   syncPolicy:
@@ -11,6 +11,6 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    path:    Slashtec-Helm-Chart-main/charts/slashtec-helm-chart
+    path:    myfirstdeployment/helm
     repoURL: git@github.com:waseemhaddad52/haddad.git
     targetRevision: main
