@@ -1,0 +1,125 @@
+# Override the default helm chart name
+nameOverride: "todo-list"
+# Override the default helm chart full name
+fullnameOverride: "todo-list"
+cluster: "todo_cluster"
+# Specify the environment name (dev, staging, production, etc.)
+environment: "dev" # Default environment, will be overridden by Jenkins
+
+# Labels to attach to all Kubernetes resources created by this chart
+commonLabels:
+  app_name: "todo-list"
+  app_env: "dev"
+  app: "todo-list"
+
+serviceAccount:
+  create: false
+  annotations: {}
+  name: "todo-list"
+  multiServiceAccounts:
+    enabled: false  # Set this to true if you want to enable multi-service accounts
+
+persistence:
+  enabled: false
+  existingClaim: ""
+  storageClass: gp3
+  size: 10Gi
+  accessMode: ReadWriteOnce
+
+StatefulSet:
+  enabled: false
+
+serviceMonitor:
+  enabled: false
+
+deployment:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: "727245885999.dkr.ecr.us-east-2.amazonaws.com/todo-list"
+    tag: "dev_40"  # Set the correct tag
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 200m
+    limits:
+      memory: 1024Mi
+      cpu: 1
+  serviceIntention:
+    enabled: false
+  serviceDefault:
+    enabled: false
+  migrationjob:  # Define the migrationjob here
+    enabled: false  # Set to true if you need the migration job
+
+  
+  
+service:
+  enabled: true
+  type: NodePort
+  port:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      name: http
+
+autoscaling:
+  enabled: true  # Set this to true if you want to enable autoscaling
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+
+externalSecretgcp:
+  creationPolicy: "Owner"  # or set as needed, e.g., "Orphan", "Retain", etc.
+  enabled: false  # Set this to true if you want to enable external secrets for GCP
+  secretName: "gcp-secret-name"  # Example secret name
+  
+externalSecret:
+  enabled: false  # Set to true if you want to enable external secrets
+  secretName: "your-secret-name"  # Name of the secret
+  key: "your-secret-key"  # Key within the secret
+  
+livenessProbe:
+  enabled: false  # Set to true if you want to enable liveness probe
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 3
+  successThreshold: 1
+
+readinessProbe:
+  enabled: false  # Set to true if you want to enable readiness probe
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 3
+  successThreshold: 1
+
+goDBMigration:
+  enabled: false  # Set to true if you want to enable database migration
+  # Add other parameters as needed for migration, e.g., database URL, user, etc.
+rustDBMigration:
+  enabled: false  # Set this to true if you want to enable the Rust DB migration job
+cronjob:
+  enabled: false
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: "waseem.yousefneedsajob.click"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: "todo-list"
+                port:
+                  number: 8080
+  tls:
+    enabled: false  # Set this to true if you want to enable TLS
+    secretName: false  # This is required if TLS is enabled
+podMonitor:
+  enabled: false  # Set this to true if you want to enable PodMonitor

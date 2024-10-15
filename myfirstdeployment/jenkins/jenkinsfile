@@ -1,0 +1,80 @@
+def branchName               =  "main"
+def gitUrl                   =  "https://github.com/waseemhaddad52/haddad.git"
+def serviceName              =  "todo-list"
+def EnvName                  =  "dev"
+def imageTag                 =  "${EnvName}_${BUILD_NUMBER}"
+def awsRegion                =  "us-east-2"
+def ecrUrl                   =  "727245885999.dkr.ecr.us-east-2.amazonaws.com"
+
+
+
+node () {
+    cleanWs()
+    try {
+        notifyBuild('STARTED')
+        
+        script {
+            properties([
+                parameters([
+                    string(defaultValue: 'main', name: 'branchName')
+                ])
+            ])
+        }
+
+        stage ("Code Checkout") {
+            checkout([$class: 'GitSCM', branches: [[name: "${branchName}"]], extensions: [], userRemoteConfigs: [[url: "${gitUrl}"]]] )
+            sh "rm -rf .git"   
+        }
+
+        stage ('ECR Login') {
+            sh "aws ecr get-login-password --region ${awsRegion} | docker login --username AWS --password-stdin ${ecrUrl}"
+        }  
+
+        stage ('Docker Build') {
+            dir('dockers') {
+                sh "docker build -t ${ecrUrl}/${serviceName}:${imageTag} ."
+            }
+        }
+
+        stage ('Docker Push') {
+            sh "docker push ${ecrUrl}/${serviceName}:${imageTag}"
+        }  
+
+        stage ("Helm Deployment") {
+          sh " aws eks update-kubeconfig --region us-east-2 --name waseemeks-dev"  
+             sh """
+                helm upgrade --install  slashtec Slashtec-Helm-Chart-main/charts/slashtec-helm-chart \
+                --namespace ${EnvName} \
+                --set deployment.image.repository=${ecrUrl}/${serviceName} \
+                --set deployment.image.tag=${imageTag} \
+                --create-namespace 
+               
+                
+            """
+        }
+
+        stage('Remove Local Images') {
+            sh "docker rmi -f ${ecrUrl}/${imageTag} || :"
+        }   
+    } catch (e) {
+        currentBuild.result = "FAILED"
+        throw e
+    } finally {
+        notifyBuild(currentBuild.result)
+    }
+}
+
+def notifyBuild(String buildStatus = 'STARTED') {
+    buildStatus = buildStatus ?: 'SUCCESSFUL'
+
+    def colorCode = '#FF0000'
+    def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
+    def summary = "${subject} (${env.BUILD_URL})"
+
+    if (buildStatus == 'STARTED') {
+        colorCode = '#FFFF00'
+    } else if (buildStatus == 'SUCCESSFUL') {
+        colorCode = '#00FF00'
+    }
+    // slackSend or other notification methods go here
+}
