@@ -1,20 +1,21 @@
-# Use an official Node.js image from DockerHub
+# Use an official Node.js image
 FROM node:14
 
-# Create and set the working directory inside the container
+# Set the working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Copy package files and install dependencies
 COPY package*.json ./
-
-# Install dependencies
 RUN npm install
 
-# Copy the rest of the application code
+# Copy the rest of the code
 COPY . .
 
-# Expose the application port
+# Create the logs directory
+RUN mkdir -p /app/logs
+
+# Expose the port
 EXPOSE 3000
 
-# Command to start the app
+# Start the app
 CMD ["npm", "start"]
