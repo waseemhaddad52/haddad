@@ -36,7 +36,7 @@ deployment:
   enabled: true
   replicaCount: 1
   image:
-    repository: "727245885999.dkr.ecr.us-east-2.amazonaws.com/todo-list"
+    repository: "727245885999.dkr.ecr.us-east-2.amazonaws.com/hello-world"
     tag: "dev_1"  # Set the correct tag
     pullPolicy: IfNotPresent
   resources:
