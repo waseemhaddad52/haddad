@@ -109,7 +109,7 @@ setup.kibana:
   # Scheme and port can be left out and will be set to the default (http and 5601)
   # In case you specify and additional path, the scheme is required: http://localhost:5601/path
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
-  host: "kibana.mon.svc.cluster.local:5601"
+  host: "kibana-kibana.mon.svc.cluster.local:5601"
   # Kibana Space ID
   # ID of the Kibana Space into which the dashboards should be loaded. By default,
   # the Default Space will be used.
@@ -128,7 +128,7 @@ setup.kibana:
 # ---------------------------- Elasticsearch Output ----------------------------
 output.elasticsearch:
   # Array of hosts to connect to.
-  hosts: ["elasticsearch.mon.svc.cluster.local:9200"]
+  hosts: ["elasticsearch-master.mon.svc.cluster.local:9200"]
   index: "hello-world-%{[agent.version]}-%{+yyyy.MM.dd}"
   # Protocol - either `http` (default) or `https`.
   #protocol: "https"
