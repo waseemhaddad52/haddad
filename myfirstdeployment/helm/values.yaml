@@ -37,7 +37,7 @@ deployment:
   replicaCount: 1
   image:
     repository: "727245885999.dkr.ecr.us-east-2.amazonaws.com/hello-world"
-    tag: "dev_40"  # Set the correct tag
+    tag: "dev_41"  # Set the correct tag
     pullPolicy: IfNotPresent
   resources:
     requests:
