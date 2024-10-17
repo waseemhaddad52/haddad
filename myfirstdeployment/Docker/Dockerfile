@@ -13,7 +13,7 @@ COPY . .
 
 # Create the logs directory
 RUN mkdir -p /app/logs
-COPY --chown=www-data:www-data /app/log /app/log
+COPY --chown=www-data:www-data /app/logs /app/logs
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 # Expose the port
 EXPOSE 3000
