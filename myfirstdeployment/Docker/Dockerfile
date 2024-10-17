@@ -17,7 +17,8 @@ RUN mkdir -p /app/logs
 # filebeat
 RUN wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | gpg --dearmor -o /usr/share/keyrings/elasticsearch-keyring.gpg
 RUN echo "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | tee /etc/apt/sources.list.d/elastic-8.x.list
-RUN apt update -y && apt install -y filebeat=8.15.2COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+RUN apt update -y && apt install -y filebeat=8.15.2
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 # Expose the port
 EXPOSE 3000
 # filebeat
